@@ -1,0 +1,54 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#define MAX_LINE_LENGTH 1024
+
+typedef struct {
+    char old_name[50];
+    char new_name[50];
+} VariableMapping;
+
+VariableMapping var_mappings[100];
+int var_count = 0;
+
+void rename_variables(char *line) {
+    for (int i = 0; i < var_count; i++) {
+        char *pos = strstr(line, var_mappings[i].old_name);
+        while (pos != NULL) {
+            char temp[MAX_LINE_LENGTH];
+            strcpy(temp, pos + strlen(var_mappings[i].old_name));
+            snprintf(pos, MAX_LINE_LENGTH, "%s%s", var_mappings[i].new_name, temp);
+            pos = strstr(line, var_mappings[i].old_name);
+        }
+    }
+}
+
+void generate_intermediate_code(char *line) {
+    char var1[50], var2[50], var3[50];
+    if (sscanf(line, "%s := %s + %s", var1, var2, var3) == 3) {
+        printf("t1 = %s + %s\n", var2, var3);
+        printf("%s = t1\n", var1);
+    } else {
+        printf("%s", line);
+    }
+}
+
+void process_input() {
+    char *input_lines[] = {
+        "a := b + c", 
+        "x := y + z",
+        "END"
+    };
+    
+    for (int i = 0; strcmp(input_lines[i], "END") != 0; i++) {
+        generate_intermediate_code(input_lines[i]);
+    }
+}
+
+int main() {
+    process_input();
+    printf("Intermediate code generation completed.\n");
+    return 0;
+}
